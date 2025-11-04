@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var router = Router()
+    @State private var scratchCardStore = ScratchCardStore()
     
     var body: some View {
         NavigationStack(path: $router.path) {
@@ -20,6 +21,7 @@ struct ContentView: View {
                     }
                 }
         }
+        .environment(scratchCardStore)
         .environment(router)
     }
 }
