@@ -12,23 +12,28 @@ struct HomeView: View {
     @Environment(ScratchCardStore.self) private var store
     
     var body: some View {
-        VStack {
+        VStack(spacing: 20) {
             scratchCardState()
             
-            Button("Scratch Card") {
+            MenuButton("Scratch Card") {
                 router.navigate(to: .scratchCard)
             }
-            .padding(16)
-            .border(.black)
+            
+            MenuButton("Activate") {
+                router.navigate(to: .activation)
+            }
         }
     }
     
     private func scratchCardState() -> some View {
         VStack {
-            if let code = store.code {
-                Text("Your card has been scratched. Your code: \(code.uuidString)")
-            } else {
+            switch store.state {
+            case .unscratched:
                 Text("Your card is not scratched yet")
+            case .scratched(let code):
+                Text("Your card has been scratched. Your code: \(code.uuidString)")
+            case .activated:
+                Text("Your card has been activated")
             }
         }
     }

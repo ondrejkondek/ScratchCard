@@ -18,6 +18,8 @@ struct ContentView: View {
                     switch route {
                     case .scratchCard:
                         ScratchCardView()
+                    case .activation:
+                        ActivationView()
                     }
                 }
         }
