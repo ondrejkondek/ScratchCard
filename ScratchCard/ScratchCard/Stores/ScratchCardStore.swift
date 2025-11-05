@@ -9,11 +9,12 @@ import SwiftUI
 
 @Observable
 final class ScratchCardStore {
+    var state: CardState = .unscratched
+    var errorMessage: AlertData?
+    private var scratchTask: Task<Void, Never>?
+
     @ObservationIgnored
     private let cardService = ServiceFactory.make(type: CardService.self)
-
-    var state: CardState = .unscratched
-    private var scratchTask: Task<Void, Never>?
     
     func scratchCard() async {
         scratchTask = Task {
@@ -25,6 +26,7 @@ final class ScratchCardStore {
                 state = .scratched(code: code)
             } catch {
                 // TODO: error handling + alert
+                // No handling needed - api call is simulated and response is guaranteed
             }
         }
         await scratchTask?.value
@@ -34,24 +36,31 @@ final class ScratchCardStore {
         scratchTask?.cancel()
         scratchTask = nil
     }
-}
-
-enum CardState: Equatable {
-    case unscratched
-    case scratched(code: UUID)
-    case activated
     
-    static func == (lhs: CardState, rhs: CardState) -> Bool {
-        switch (lhs, rhs) {
-        case (.unscratched, .unscratched),
-             (.activated, .activated):
-            return true
-
-        case let (.scratched(code1), .scratched(code2)):
-            return code1 == code2
-
-        default:
-            return false
+    func activateCard(code: UUID) {
+        Task {
+            do {
+                let version = try await cardService.activateCard(code: code)
+                handleVersionResponse(version)
+            } catch {
+                handleActivationError()
+            }
         }
+    }
+    
+    private func handleVersionResponse(_ response: VersionResponse) {
+        if let version = Double(response.ios) {
+            if version > 6.1 {
+                state = .activated
+            } else {
+                handleActivationError()
+            }
+        } else {
+            handleActivationError()
+        }
+    }
+    
+    private func handleActivationError() {
+        errorMessage = AlertData(title: "Error", message: "Unable to activate your code")
     }
 }

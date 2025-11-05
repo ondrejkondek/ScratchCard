@@ -12,7 +12,7 @@ struct HomeView: View {
     @Environment(ScratchCardStore.self) private var store
     
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 30) {
             scratchCardState()
             
             MenuButton("Scratch Card") {

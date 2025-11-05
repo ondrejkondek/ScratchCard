@@ -23,6 +23,15 @@ struct ContentView: View {
                     }
                 }
         }
+        .alert(item: $router.alert) { alert in
+            Alert(
+                title: Text(alert.title),
+                message: Text(alert.message ?? ""),
+                dismissButton: .default(Text("OK")) {
+                    router.dismissAlert()
+                }
+            )
+        }
         .environment(scratchCardStore)
         .environment(router)
     }

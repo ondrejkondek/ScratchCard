@@ -9,26 +9,36 @@ import SwiftUI
 
 struct ActivationView: View {
     @Environment(Router.self) private var router
-    
-    let manager: NetworkManager = NetworkManager()
+    @Environment(ScratchCardStore.self) private var store
 
     var body: some View {
-        Text("Activation View")
-            .onAppear {
-                Task {
-                    do {
-                        let request = ApiEndpoints.activate(code: UUID()).request
-                        let model = try await self.manager.request(request, body: VersionResponse.self)
-                        print(model)
-                    } catch {
-                        print("error: \(error)")
-                    }
+        VStack(spacing: 30) {
+            Text("Activation View")
+            
+            if store.state == .activated {
+                Text("The code has been successfully activated")
+            }
+
+            MenuButton("Activate card") {
+                switch store.state {
+                case .scratched(let code):
+                    store.activateCard(code: code)
+                default:
+                    return
                 }
             }
+            .disabled(store.state == .activated || store.state == .unscratched)
+        }
+        .onChange(of: store.errorMessage) { _, alert in
+            guard let alert else { return }
+            router.showAlert(title: alert.title, message: alert.message)
+            store.errorMessage = nil // reset after showing
+        }
     }
 }
 
 #Preview {
     ActivationView()
         .environment(Router())
+        .environment(ScratchCardStore())
 }

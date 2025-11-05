@@ -10,6 +10,7 @@ import SwiftUI
 @Observable
 final class Router {
     var path: [Route] = []
+    var alert: AlertData?
     
     func navigate(to route: Route) {
         path.append(route)
@@ -21,5 +22,13 @@ final class Router {
     
     func reset() {
         path.removeAll()
+    }
+    
+    func showAlert(title: String, message: String? = nil) {
+        alert = AlertData(title: title, message: message)
+    }
+    
+    func dismissAlert() {
+        alert = nil
     }
 }
