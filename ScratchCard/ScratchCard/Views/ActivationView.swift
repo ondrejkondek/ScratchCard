@@ -13,7 +13,7 @@ struct ActivationView: View {
 
     var body: some View {
         VStack(spacing: 30) {
-            Text("Activation View")
+            Text("Activation View - click to activate scratched card")
             
             if store.state == .activated {
                 Text("The code has been successfully activated")
@@ -22,7 +22,9 @@ struct ActivationView: View {
             MenuButton("Activate card") {
                 switch store.state {
                 case .scratched(let code):
-                    store.activateCard(code: code)
+                    Task {
+                        await store.activateCard(code: code)
+                    }
                 default:
                     return
                 }

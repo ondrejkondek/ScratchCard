@@ -14,9 +14,14 @@ final class ScratchCardStore {
     private var scratchTask: Task<Void, Never>?
 
     @ObservationIgnored
-    private let cardService = ServiceFactory.make(type: CardService.self)
+    private let cardService: CardServiceProtocol
+
+    init(cardService: CardServiceProtocol = ServiceFactory.make(type: CardService.self)) {
+        self.cardService = cardService
+    }
     
     func scratchCard() async {
+        guard state == .unscratched else { return }
         scratchTask = Task {
             guard state == .unscratched else { return }
 
@@ -37,14 +42,13 @@ final class ScratchCardStore {
         scratchTask = nil
     }
     
-    func activateCard(code: UUID) {
-        Task {
-            do {
-                let version = try await cardService.activateCard(code: code)
-                handleVersionResponse(version)
-            } catch {
-                handleActivationError()
-            }
+    func activateCard(code: UUID) async {
+        guard state == .scratched(code: code) else { return }
+        do {
+            let version = try await cardService.activateCard(code: code)
+            handleVersionResponse(version)
+        } catch {
+            handleActivationError()
         }
     }
     

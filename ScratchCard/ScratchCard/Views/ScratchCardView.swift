@@ -23,25 +23,7 @@ struct ScratchCardView: View {
                 }
             } label: {
                 if !isLoading {
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(store.state != .unscratched ? Color.blue.opacity(0.8) : Color.green.opacity(0.8))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 20)
-                                .stroke(.black, lineWidth: 2)
-                        )
-                        .frame(width: 300, height: 150)
-                        .overlay(
-                            VStack {
-                                switch store.state {
-                                case .scratched(let code):
-                                    Text(code.uuidString)
-                                        .foregroundStyle(.black)
-                                default:
-                                    Text("Click to scratch")
-                                        .foregroundStyle(.black)
-                                }
-                            }
-                        )
+                    scratchCard
                 } else {
                     ProgressView("Scratching...")
                         .progressViewStyle(.circular)
@@ -51,6 +33,31 @@ struct ScratchCardView: View {
         .onDisappear {
             store.cancelScratch()
         }
+    }
+    
+    var scratchCard: some View {
+        RoundedRectangle(cornerRadius: 20)
+            .fill(store.state != .unscratched ? Color.blue.opacity(0.8) : Color.green.opacity(0.8))
+            .overlay(
+                RoundedRectangle(cornerRadius: 20)
+                    .stroke(.black, lineWidth: 2)
+            )
+            .frame(width: 300, height: 150)
+            .overlay(
+                VStack {
+                    switch store.state {
+                    case .scratched(let code):
+                        Text(code.uuidString)
+                            .foregroundStyle(.black)
+                    case .activated:
+                        Text("Activated")
+                            .foregroundStyle(.black)
+                    default:
+                        Text("Click to scratch")
+                            .foregroundStyle(.black)
+                    }
+                }
+            )
     }
 }
 

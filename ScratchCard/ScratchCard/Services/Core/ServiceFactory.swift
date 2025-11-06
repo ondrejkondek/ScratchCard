@@ -16,7 +16,7 @@ final class ServiceFactory {
         case .prod:
             fatalError("Not implemented")
         case .mock:
-            fatalError("Not implemented")
+            return T(networkManager: MockedNetworkManager())
         }
     }
 }

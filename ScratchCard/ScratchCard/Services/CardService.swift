@@ -16,7 +16,7 @@ class CardService: ServiceProvider, CardServiceProtocol {
     
     func generateId() async throws -> UUID {
         // TODO: Simulation of API Call
-        try? await Task.sleep(nanoseconds: 5 * 1_000_000_000)
+        try? await Task.sleep(nanoseconds: 2 * 1_000_000_000)
         
         return UUID()
     }
